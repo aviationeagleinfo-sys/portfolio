@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AE Portfolio">
+    <title>Aviation Eagle Portfolio</title>
+    
+    <style>
+        :root {
+            --ae-gold: #c5a059;
+            --ae-blue: #0a192f;
+            --ae-accent: #172a45;
+            --ae-text: #e6f1ff;
+            --system-red: #ff4d4d;
+        }
+
+        /* Reset e Fix per Mobile */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%;
+            height: 100%;
+            height: -webkit-fill-available;
+            background-color: var(--ae-blue);
+            color: var(--ae-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden; /* Bloccato finché non si entra nel portfolio */
+        }
+
+        /* 1. SCHERMATA DI AVVIO (Splash Screen) */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            background: var(--ae-blue);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader-ring {
+            width: 70px; height: 70px;
+            border: 3px solid var(--ae-accent);
+            border-top: 3px solid var(--ae-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 2. AUTH SCREEN (Password Box) */
+        #auth-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none; /* Gestito via JS */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 5000;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            background: var(--ae-accent);
+            border: 2px solid var(--ae-gold);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px; /* Previene zoom iOS */
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-ae {
+            width: 100%;
+            background: var(--ae-gold);
+            color: var(--ae-blue);
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        #error-msg {
+            color: var(--system-red);
+            font-size: 0.8rem;
+            margin-top: 15px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* 3. MAIN PORTFOLIO CONTENT */
+        #main-content {
+            display: none;
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            padding: env(safe-area-inset-top) 20px 40px 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .header {
+            padding: 40px 0 20px 0;
+            border-bottom: 1px solid var(--ae-accent);
+            margin-bottom: 30px;
+        }
+
+        .header h1 { color: var(--ae-gold); margin: 0; font-size: 1.8rem; }
+        .header p { opacity: 0.7; margin: 5px 0 0 0; }
+
+        .project-card {
+            background: var(--ae-accent);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(197, 160, 89, 0.1);
+        }
+
+        .project-card h3 { margin-top: 0; color: var(--ae-gold); }
+        .project-card p { font-size: 0.95rem; line-height: 1.5; opacity: 0.9; }
+        
+        .project-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--ae-gold);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="loader-ring"></div>
+        <h2 style="margin-top: 25px; letter-spacing: 4px; font-weight: 300;">AVIATION EAGLE</h2>
+        <div style="width: 40px; height: 2px; background: var(--ae-gold); margin-top: 10px;"></div>
+    </div>
+
+    <div id="auth-screen">
+        <div class="auth-container">
+            <h3 style="margin-bottom: 10px; color: var(--ae-gold);">RESTRICTED AREA</h3>
+            <p style="font-size: 0.8rem; margin-bottom: 25px; opacity: 0.7;">Identificazione richiesta per Eagle One</p>
+            <input type="password" id="passInput" placeholder="ENTER ACCESS CODE" autocomplete="off">
+            <button class="btn-ae" onclick="checkPassword()">Verify Identity</button>
+            <p id="error-msg">ACCESS DENIED - CODE INVALID</p>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="header">
+            <h1>Web Portfolio</h1>
+            <p>Aviation Eagle Operations</p>
+        </div>
+
+        <div class="project-card">
+            <h3>AviationEagle.co.uk</h3>
+            <p>Piattaforma principale per l'analisi dei voli e news del settore. Ottimizzazione delle performance e layout responsive.</p>
+            <a href="https://aviationeagle.co.uk" class="project-link">OPEN TERMINAL →</a>
+        </div>
+
+        <div class="project-card">
+            <h3>Flight Offer Scraper</h3>
+            <p>Sistema di monitoraggio automatico delle offerte con traduzione istantanea e catalogazione per compagnia.</p>
+        </div>
+
+        <div class="project-card">
+            <h3>Custom UI Framework</h3>
+            <p>Interfaccia ispirata ai sistemi aeronautici per una gestione dati rapida ed efficiente.</p>
+        </div>
+    </div>
+
+    <script>
+        const SPLASH_KEY = 'ae_session_active';
+        const splash = document.getElementById('splash-screen');
+        const auth = document.getElementById('auth-screen');
+        const main = document.getElementById('main-content');
+        const errorMsg = document.getElementById('error-msg');
+
+        window.addEventListener('load', () => {
+            // Se la sessione è già attiva, saltiamo lo splash screen
+            if (sessionStorage.getItem(SPLASH_KEY)) {
+                splash.style.display = 'none';
+                auth.style.display = 'flex';
+            } else {
+                // Primo avvio della sessione
+                setTimeout(() => {
+                    splash.style.opacity = '0';
+                    setTimeout(() => {
+                        splash.style.display = 'none';
+                        auth.style.display = 'flex';
+                        sessionStorage.setItem(SPLASH_KEY, 'true');
+                    }, 800);
+                }, 2000); // 2 secondi di splash
+            }
+        });
+
+        function checkPassword() {
+            const pass = document.getElementById('passInput').value;
+            
+            if (pass === "PORTFOLIOPRIVATOAE") {
+                auth.style.display = 'none';
+                main.style.display = 'block';
+                // Sblocca lo scrolling della pagina
+                document.body.style.overflow = 'auto';
+                document.body.style.position = 'relative';
+            } else {
+                errorMsg.style.opacity = '1';
+                setTimeout(() => { errorMsg.style.opacity = '0'; }, 3000);
+                document.getElementById('passInput').value = '';
+            }
+        }
+
+        // Previene lo zoom su doppio tocco per pulsanti
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
